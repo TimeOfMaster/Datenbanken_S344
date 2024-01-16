@@ -46,7 +46,7 @@ public class Reinigungsmanager{
     }
 
     /**
-     * Beispielmethode zum Ändern der Datensätze.
+     * Beispielmethode zum ï¿½ndern der Datensï¿½tze.
      */
     public void abreisedatumHeute(){
         String s = "UPDATE Gast SET bis = CURDATE()-2 WHERE GastID = 1 ";
@@ -57,7 +57,7 @@ public class Reinigungsmanager{
     }
     
     /**
-     * Fügt einen neuen Gast in die Tabelle Gast ein.
+     * Fï¿½gt einen neuen Gast in die Tabelle Gast ein.
      * Die GastID wird automatisch gesetzt.
      * @param von gibt an, um wieviele Tage das Anreisedatum vom aktuellen Datum abweicht.
      * @param bis gibt an, um wieviele Tage das Abreisedatum vom aktuellen Datum abweicht.
@@ -71,7 +71,7 @@ public class Reinigungsmanager{
     }    
     
     /**
-     * Hilfsmethode für f ii)
+     * Hilfsmethode fÃ¼r f ii)
      * @return true, wenn das erste als Parameter u?bergebene Datum zeitlich fru?her 
      * oder gleich dem zweiten als Paramter u?bergebenen Datum ist.
      */
@@ -100,6 +100,14 @@ public class Reinigungsmanager{
             }
             reinigungsauftraege.next();
         }
+    }
+
+    public void executeQuery(String query) {
+        datenbank.executeStatement(query);
+        try {
+            QueryResult result = datenbank.getCurrentQueryResult();
+            arrayAusgeben(result);
+        } catch (Exception e) {}
     }
     
 }
