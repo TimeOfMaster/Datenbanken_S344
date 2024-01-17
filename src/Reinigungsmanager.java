@@ -104,10 +104,16 @@ public class Reinigungsmanager{
 
     public void executeQuery(String query) {
         datenbank.executeStatement(query);
-        try {
-            QueryResult result = datenbank.getCurrentQueryResult();
-            arrayAusgeben(result);
-        } catch (Exception e) {}
+        QueryResult result = datenbank.getCurrentQueryResult();
+        arrayAusgeben(result);
     }
     
+
+    public void freieZimmer() {
+        String query = "SELECT DISTINCT ZimmerNr FROM Gast WHERE bis < Date()";
+        datenbank.executeStatement(query);
+        QueryResult result = datenbank.getCurrentQueryResult();
+        arrayAusgeben(result);
+        
+    }
 }
