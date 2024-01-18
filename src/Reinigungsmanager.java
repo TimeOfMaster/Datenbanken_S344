@@ -72,7 +72,7 @@ public class Reinigungsmanager{
     
     /**
      * Hilfsmethode für f ii)
-     * @return true, wenn das erste als Parameter u?bergebene Datum zeitlich früher 
+     * @return true, wenn das erste als Parameter übergebene Datum zeitlich früher 
      * oder gleich dem zweiten als Paramter übergebenen Datum ist.
      */
     public boolean frueherAls(String datum1, String datum2){
@@ -114,15 +114,19 @@ public class Reinigungsmanager{
         datenbank.executeStatement(query);
         QueryResult result = datenbank.getCurrentQueryResult();
 
-
-        freieZimmer = resultToZimmerList(result);
+        List<Zimmer> list = resultToZimmerList(result);
+        list.toFirst();
+        while (list.hasAccess()) {
+            freieZimmer.append(list.getContent());
+            freieZimmer.next();
+        }
         
     }
 
     public List<Zimmer> resultToZimmerList(QueryResult result) {
         List<Zimmer> list = new List<Zimmer>();
 
-        if(result != null){
+        if(result != null) {
             for (int row = 0; row < result.getRowCount(); row++) {
                 String[] data = result.getData()[row];
                 list.append(new Zimmer(Integer.parseInt(data[0])));
@@ -130,5 +134,80 @@ public class Reinigungsmanager{
         }
 
         return list;
+    }
+
+    public void reinigungsauftragErstellen(int zimmerNr) {
+        String dateVon = getDateVon(zimmerNr);
+        char gender = getGender(zimmerNr);
+
+        // initialize zimmer
+        Zimmer zimmer = new Zimmer(zimmerNr);
+        zimmer.setGeschlecht(gender);
+        zimmer.setFreiBis(getDateBis(zimmerNr));
+        zimmer.setGereinigt(false);
+
+        // sort zimmer into reinigungsauftraege
+        reinigungsauftraege.toFirst();
+        while (reinigungsauftraege.hasAccess()) {
+            if (frueherAls(dateVon, getDateVon(reinigungsauftraege.getContent().getZimmerNr()))) {
+                reinigungsauftraege.insert(zimmer);
+                break;
+            }
+            reinigungsauftraege.next();
+        }
+
+    }
+
+    public char getGender(int roomNr) {
+        // SQL query
+        String query = String.format("SELECT DISTINCT Geschlecht FROM Gast INNER JOIN Zimmer ON Gast.ZimmerNr = Zimmer.ZimmerNr WHERE Zimmer.bezugsfertig = 0 AND von > Date() AND Zimmer.ZimmerNr = 1;", roomNr);
+        datenbank.executeStatement(query);
+        QueryResult result = datenbank.getCurrentQueryResult();
+
+        // extract gender from result
+        String gender = "";
+        if (result != null) {
+            for (int row = 0; row < result.getRowCount(); row++) {
+                String[] data = result.getData()[row];
+                gender += data[0];
+            }
+        }
+
+        // replace "wm" & "mw" with "n"
+        if (gender.contains("w") && gender.contains("m")) {
+            gender = "n";
+        }
+
+        return gender.charAt(0);
+    }
+
+    public String getDateVon(int roomNr) {
+        // SQL query
+        String query = String.format("SELECT DISTINCT von FROM Gast INNER JOIN Zimmer ON Gast.ZimmerNr = Zimmer.ZimmerNr WHERE Zimmer.bezugsfertig = 'FALSE' AND von > Date() AND Zimmer.ZimmerNr = {zimmerNr} ORDER BY von ASC;", roomNr);
+        datenbank.executeStatement(query);
+        QueryResult result = datenbank.getCurrentQueryResult();
+
+        // extract Date from result
+        String dateVon = "";
+        if(result != null) {
+            dateVon = result.getData()[0][0];
+        }
+
+        return dateVon;
+    }
+
+    public String getDateBis(int roomNr) {
+        // SQL query
+        String query = String.format("SELECT DISTINCT bis FROM Gast INNER JOIN Zimmer ON Gast.ZimmerNr = Zimmer.ZimmerNr WHERE Zimmer.bezugsfertig = 'FALSE' AND bis > Date() AND Zimmer.ZimmerNr = {zimmerNr} ORDER BY bis ASC;", roomNr);
+        datenbank.executeStatement(query);
+        QueryResult result = datenbank.getCurrentQueryResult();
+
+        // extract Date from result
+        String dateBis = "";
+        if(result != null) {
+            dateBis = result.getData()[0][0];
+        }
+
+        return dateBis;
     }
 }
