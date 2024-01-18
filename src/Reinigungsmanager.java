@@ -46,7 +46,7 @@ public class Reinigungsmanager{
     }
 
     /**
-     * Beispielmethode zum �ndern der Datens�tze.
+     * Beispielmethode zum ändern der Datensätze.
      */
     public void abreisedatumHeute(){
         String s = "UPDATE Gast SET bis = CURDATE()-2 WHERE GastID = 1 ";
@@ -57,7 +57,7 @@ public class Reinigungsmanager{
     }
     
     /**
-     * F�gt einen neuen Gast in die Tabelle Gast ein.
+     * Fügt einen neuen Gast in die Tabelle Gast ein.
      * Die GastID wird automatisch gesetzt.
      * @param von gibt an, um wieviele Tage das Anreisedatum vom aktuellen Datum abweicht.
      * @param bis gibt an, um wieviele Tage das Abreisedatum vom aktuellen Datum abweicht.
@@ -72,8 +72,8 @@ public class Reinigungsmanager{
     
     /**
      * Hilfsmethode für f ii)
-     * @return true, wenn das erste als Parameter u?bergebene Datum zeitlich fru?her 
-     * oder gleich dem zweiten als Paramter u?bergebenen Datum ist.
+     * @return true, wenn das erste als Parameter u?bergebene Datum zeitlich früher 
+     * oder gleich dem zweiten als Paramter übergebenen Datum ist.
      */
     public boolean frueherAls(String datum1, String datum2){
         String tag1 = datum1.substring(0,2);
@@ -113,7 +113,22 @@ public class Reinigungsmanager{
         String query = "SELECT DISTINCT ZimmerNr FROM Gast WHERE bis < Date()";
         datenbank.executeStatement(query);
         QueryResult result = datenbank.getCurrentQueryResult();
-        arrayAusgeben(result);
+
+
+        freieZimmer = resultToZimmerList(result);
         
+    }
+
+    public List<Zimmer> resultToZimmerList(QueryResult result) {
+        List<Zimmer> list = new List<Zimmer>();
+
+        if(result != null){
+            for (int row = 0; row < result.getRowCount(); row++) {
+                String[] data = result.getData()[row];
+                list.append(new Zimmer(Integer.parseInt(data[0])));
+            }
+        }
+
+        return list;
     }
 }
