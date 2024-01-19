@@ -143,7 +143,7 @@ public class Reinigungsmanager{
         // initialize zimmer
         Zimmer zimmer = new Zimmer(zimmerNr);
         zimmer.setGeschlecht(gender);
-        zimmer.setFreiBis(getDateBis(zimmerNr));
+        zimmer.setFreiBis(dateVon);
         zimmer.setGereinigt(false);
 
         // sort zimmer into reinigungsauftraege
@@ -160,7 +160,7 @@ public class Reinigungsmanager{
 
     public char getGender(int roomNr) {
         // SQL query
-        String query = String.format("SELECT DISTINCT Geschlecht FROM Gast INNER JOIN Zimmer ON Gast.ZimmerNr = Zimmer.ZimmerNr WHERE Zimmer.bezugsfertig = 0 AND von > Date() AND Zimmer.ZimmerNr = 1;", roomNr);
+        String query = "SELECT DISTINCT Geschlecht FROM Gast INNER JOIN Zimmer ON Gast.ZimmerNr = Zimmer.ZimmerNr WHERE Zimmer.bezugsfertig = 0 AND von > Date() AND Zimmer.ZimmerNr = " + roomNr + ";";
         datenbank.executeStatement(query);
         QueryResult result = datenbank.getCurrentQueryResult();
 
@@ -183,7 +183,7 @@ public class Reinigungsmanager{
 
     public String getDateVon(int roomNr) {
         // SQL query
-        String query = String.format("SELECT DISTINCT von FROM Gast INNER JOIN Zimmer ON Gast.ZimmerNr = Zimmer.ZimmerNr WHERE Zimmer.bezugsfertig = 'FALSE' AND von > Date() AND Zimmer.ZimmerNr = {zimmerNr} ORDER BY von ASC;", roomNr);
+        String query = "SELECT DISTINCT von FROM Gast INNER JOIN Zimmer ON Gast.ZimmerNr = Zimmer.ZimmerNr WHERE Zimmer.bezugsfertig = 'FALSE' AND von > Date() AND Zimmer.ZimmerNr =" + roomNr + ";";
         datenbank.executeStatement(query);
         QueryResult result = datenbank.getCurrentQueryResult();
 
@@ -198,7 +198,7 @@ public class Reinigungsmanager{
 
     public String getDateBis(int roomNr) {
         // SQL query
-        String query = String.format("SELECT DISTINCT bis FROM Gast INNER JOIN Zimmer ON Gast.ZimmerNr = Zimmer.ZimmerNr WHERE Zimmer.bezugsfertig = 'FALSE' AND bis > Date() AND Zimmer.ZimmerNr = {zimmerNr} ORDER BY bis ASC;", roomNr);
+        String query = "SELECT DISTINCT bis FROM Gast INNER JOIN Zimmer ON Gast.ZimmerNr = Zimmer.ZimmerNr WHERE Zimmer.bezugsfertig = 'FALSE' AND bis > Date() AND Zimmer.ZimmerNr = "  + roomNr + ";";
         datenbank.executeStatement(query);
         QueryResult result = datenbank.getCurrentQueryResult();
 
